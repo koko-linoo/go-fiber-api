@@ -1,6 +1,8 @@
 package config
 
 import (
+	"log"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
@@ -16,7 +18,10 @@ func InitDatabase() {
 
 	if err != nil {
 		panic("Failed to connect to database")
+	} else {
+		log.Println("Connected to database")
 	}
 
 	DB.AutoMigrate(&models.User{})
+	log.Println("Migrated database")
 }
