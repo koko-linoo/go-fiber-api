@@ -1,6 +1,6 @@
 package models
 
-type UpdateUser struct {
+type UserUpdate struct {
 	FullName *string `json:"fullName" validate:"omitempty"`
 	Username *string `json:"username" validate:"omitempty"`
 	Email    *string `json:"email" validate:"omitempty"`
@@ -8,12 +8,12 @@ type UpdateUser struct {
 	Password *string `json:"password" validate:"omitempty"`
 }
 
-func (u UpdateUser) GetMap() map[string]any {
+func (u UserUpdate) GetMap() map[string]any {
 
 	updates := make(map[string]any)
 
 	if u.FullName != nil {
-		updates["fullName"] = u.FullName
+		updates["full_name"] = u.FullName
 	}
 	if u.Username != nil {
 		updates["username"] = u.Username

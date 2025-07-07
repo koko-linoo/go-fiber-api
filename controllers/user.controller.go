@@ -10,7 +10,7 @@ import (
 )
 
 func CreateUser(c *fiber.Ctx) error {
-	var createUser models.CreateUser
+	var createUser models.UserCreate
 	if err := c.BodyParser(&createUser); err != nil {
 		return fiber.ErrBadRequest
 	}
@@ -23,7 +23,7 @@ func CreateUser(c *fiber.Ctx) error {
 		})
 	}
 
-	usr, err := services.CreateUser(createUser.GetUser())
+	usr, err := services.CreateUser(createUser.ToUser())
 
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -45,7 +45,7 @@ func UpdateUser(c *fiber.Ctx) error {
 		return fiber.ErrBadRequest
 	}
 
-	var updateUser models.UpdateUser
+	var updateUser models.UserUpdate
 	if err := c.BodyParser(&updateUser); err != nil {
 		return fiber.ErrBadRequest
 	}
@@ -70,10 +70,15 @@ func UpdateUser(c *fiber.Ctx) error {
 	return c.JSON(usr)
 }
 
-func GetUser(c *fiber.Ctx) error {
-	username := c.Params("username")
+func GetUserById(c *fiber.Ctx) error {
+	id := c.Params("id")
+	idInt, err := strconv.Atoi(id)
 
-	user, err := services.GetUser(username)
+	if err != nil {
+		return fiber.ErrBadRequest
+	}
+
+	user, err := services.GetUserByID(uint(idInt))
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Internal server error",

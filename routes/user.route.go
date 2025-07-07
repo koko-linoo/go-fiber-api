@@ -7,12 +7,12 @@ import (
 	"github.com/koko-linoo/go-fiber-api/controllers"
 )
 
-func InitRoutes(app fiber.Router) {
+func InitUserRoutes(app fiber.Router) {
 	user := app.Group("/users")
 
 	user.Post("/", controllers.CreateUser)
 	user.Put("/:id", controllers.UpdateUser)
-	user.Get("/:username", controllers.GetUser)
+	user.Get("/:id", controllers.GetUserById)
 	user.Get("/", controllers.GetAllUsers)
 	user.Delete("/:id", controllers.DeleteUser)
 

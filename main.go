@@ -13,18 +13,9 @@ func init() {
 }
 
 func main() {
-	app := fiber.New(fiber.Config{
-		ErrorHandler: func(c *fiber.Ctx, err error) error {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"status":  "error",
-				"message": err.Error(),
-			})
-		},
-	})
+	app := fiber.New()
 
-	api := app.Group("/api")
-
-	routes.InitRoutes(api)
+	routes.InitRoutes(app)
 
 	app.Listen(":3000")
 

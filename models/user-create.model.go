@@ -1,6 +1,6 @@
 package models
 
-type CreateUser struct {
+type UserCreate struct {
 	FullName string  `json:"fullName" validate:"required"`
 	Username string  `json:"username" validate:"required"`
 	Email    string  `json:"email" validate:"required"`
@@ -8,7 +8,7 @@ type CreateUser struct {
 	Password string  `json:"password" validate:"required"`
 }
 
-func (u CreateUser) GetUser() User {
+func (u UserCreate) ToUser() User {
 	return User{
 		FullName: u.FullName,
 		Username: u.Username,

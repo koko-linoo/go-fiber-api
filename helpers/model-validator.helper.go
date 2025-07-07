@@ -10,20 +10,14 @@ var check = validator.New()
 
 func Validate(u any) *[]string {
 
-	messages := make([]string, 0)
-
-	err := check.Struct(u)
-	if err != nil {
-		switch e := err.(type) {
-		case validator.ValidationErrors:
-			for _, fieldErr := range e {
-				messages = append(messages, fmt.Sprintf("%s is %s", fieldErr.Field(), fieldErr.Tag()))
-			}
-		default:
-			messages = append(messages, e.Error())
+	if err := check.Struct(u); err != nil {
+		errs := err.(validator.ValidationErrors)
+		messages := make([]string, 0)
+		for _, fieldErr := range errs {
+			messages = append(messages, fmt.Sprintf("%s is %s", fieldErr.Field(), fieldErr.Tag()))
 		}
-
 		return &messages
 	}
+
 	return nil
 }

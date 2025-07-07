@@ -3,9 +3,19 @@ package services
 import (
 	"github.com/koko-linoo/go-fiber-api/config"
 	"github.com/koko-linoo/go-fiber-api/models"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func CreateUser(user models.User) (*models.User, error) {
+
+	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+
+	if err != nil {
+		return nil, err
+	}
+
+	user.Password = string(hash)
+
 	if result := config.DB.Create(&user); result.Error != nil {
 		return nil, result.Error
 	}
@@ -13,8 +23,9 @@ func CreateUser(user models.User) (*models.User, error) {
 }
 
 func UpdateUser(id int, user map[string]any) (*models.User, error) {
+	usrModel := config.DB.Model(&models.User{ID: uint(id)})
 
-	if result := config.DB.Model(&models.User{ID: uint(id)}).Updates(user); result.Error != nil {
+	if result := usrModel.Updates(user); result.Error != nil {
 		return nil, result.Error
 	}
 
@@ -31,11 +42,11 @@ func GetUserByID(id uint) (user *models.User, err error) {
 	return user, nil
 }
 
-func GetUser(username string) (user *models.User, err error) {
+func GetUserByName(username string) (user *models.User, err error) {
 
-	user = &models.User{Username: username}
+	usrModel := config.DB.Model(&models.User{})
 
-	if result := config.DB.First(&user); result.Error != nil {
+	if result := usrModel.Where("username = ?", username).First(&user); result.Error != nil {
 		return nil, result.Error
 	}
 
