@@ -1,71 +1,73 @@
 package controllers
 
 import (
-	"fmt"
 	"strconv"
 
-	"github.com/go-playground/validator"
 	"github.com/gofiber/fiber/v2"
+	"github.com/koko-linoo/go-fiber-api/helpers"
 	"github.com/koko-linoo/go-fiber-api/models"
 	"github.com/koko-linoo/go-fiber-api/services"
 )
 
-var validate = validator.New()
-
 func CreateUser(c *fiber.Ctx) error {
-	var user models.User
-	if err := c.BodyParser(&user); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid request body",
+	var createUser models.CreateUser
+	if err := c.BodyParser(&createUser); err != nil {
+		return fiber.ErrBadRequest
+	}
+
+	if err := helpers.Validate(createUser); err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"message": "Bad Request",
+			"errors":  err,
+			"status":  "error",
 		})
 	}
 
-	if err := validate.Struct(&user); err != nil {
-		errs := err.(validator.ValidationErrors)
-		messages := make([]string, 0)
-		for _, e := range errs {
-			messages = append(messages, fmt.Sprintf("%s is %s", e.Field(), e.Tag()))
-		}
-		return c.Status(400).JSON(fiber.Map{"errors": messages})
-	}
-
-	newUser, err := services.CreateUser(user)
+	usr, err := services.CreateUser(createUser.GetUser())
 
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Internal server error",
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error":   "User Create Failed",
+			"message": "Bad Request",
+			"status":  "error",
 		})
 	}
 
-	return c.JSON(newUser)
+	return c.JSON(usr)
 }
 
 func UpdateUser(c *fiber.Ctx) error {
-	var user models.User
-	if err := c.BodyParser(&user); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid request body",
-		})
-	}
 
-	if err := validate.Struct(&user); err != nil {
-		errs := err.(validator.ValidationErrors)
-		messages := make([]string, 0)
-		for _, e := range errs {
-			messages = append(messages, fmt.Sprintf("%s is %s", e.Field(), e.Tag()))
-		}
-		return c.Status(400).JSON(fiber.Map{"errors": messages})
-	}
-
-	updatedUser, err := services.UpdateUser(user)
+	id := c.Params("id")
+	idInt, err := strconv.Atoi(id)
 
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Internal server error",
+		return fiber.ErrBadRequest
+	}
+
+	var updateUser models.UpdateUser
+	if err := c.BodyParser(&updateUser); err != nil {
+		return fiber.ErrBadRequest
+	}
+
+	if err := helpers.Validate(updateUser); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Bad Request",
+			"errors":  err,
+			"status":  "error",
 		})
 	}
 
-	return c.JSON(updatedUser)
+	usr, err := services.UpdateUser(idInt, updateUser.GetMap())
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error":   "User Update Failed",
+			"message": "Bad Request",
+			"status":  "error",
+		})
+	}
+
+	return c.JSON(usr)
 }
 
 func GetUser(c *fiber.Ctx) error {
@@ -96,14 +98,10 @@ func DeleteUser(c *fiber.Ctx) error {
 	id := c.Params("id")
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid ID",
-		})
+		return fiber.ErrBadRequest
 	}
 
-	userID := uint(idInt)
-
-	err = services.DeleteUser(userID)
+	err = services.DeleteUser(uint(idInt))
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Internal server error",

@@ -8,10 +8,19 @@ import (
 	"github.com/koko-linoo/go-fiber-api/routes"
 )
 
-func main() {
-	app := fiber.New()
-
+func init() {
 	config.InitDatabase()
+}
+
+func main() {
+	app := fiber.New(fiber.Config{
+		ErrorHandler: func(c *fiber.Ctx, err error) error {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"status":  "error",
+				"message": err.Error(),
+			})
+		},
+	})
 
 	api := app.Group("/api")
 
@@ -20,5 +29,4 @@ func main() {
 	app.Listen(":3000")
 
 	log.Println("Server started on port :3000")
-
 }

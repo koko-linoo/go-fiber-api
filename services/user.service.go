@@ -12,19 +12,31 @@ func CreateUser(user models.User) (*models.User, error) {
 	return &user, nil
 }
 
-func UpdateUser(user models.User) (*models.User, error) {
-	if result := config.DB.Save(&user); result.Error != nil {
+func UpdateUser(id int, user map[string]any) (*models.User, error) {
+
+	if result := config.DB.Model(&models.User{ID: uint(id)}).Updates(user); result.Error != nil {
 		return nil, result.Error
 	}
-	return &user, nil
+
+	return GetUserByID(uint(id))
 }
 
-func GetUser(username string) (user models.User, err error) {
-
-	user = models.User{Username: username}
+func GetUserByID(id uint) (user *models.User, err error) {
+	user = &models.User{ID: id}
 
 	if result := config.DB.First(&user); result.Error != nil {
-		return user, result.Error
+		return nil, result.Error
+	}
+
+	return user, nil
+}
+
+func GetUser(username string) (user *models.User, err error) {
+
+	user = &models.User{Username: username}
+
+	if result := config.DB.First(&user); result.Error != nil {
+		return nil, result.Error
 	}
 
 	return user, nil

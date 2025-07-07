@@ -7,13 +7,13 @@ import (
 )
 
 type User struct {
-	ID        uint           `json:"id" gorm:"primaryKey"`
-	FullName  string         `json:"fullName" validate:"required"`
-	Username  string         `gorm:"unique" json:"username" validate:"required"`
-	Email     string         `gorm:"unique" json:"email" validate:"required"`
-	Phone     *string        `gorm:"unique" json:"phone"`
-	Password  string         `json:"password" validate:"required"`
-	CreatedAt time.Time      `gorm:"autoCreateTime"`
-	UpdatedAt time.Time      `gorm:"autoUpdateTime"`
-	DeletedAt gorm.DeletedAt `gorm:"index"`
+	ID        uint           `json:"id" gorm:"primaryKey" `
+	FullName  string         `json:"fullName"`
+	Username  string         `json:"username" gorm:"unique"`
+	Email     string         `json:"email" gorm:"unique"`
+	Phone     *string        `json:"phone" gorm:"unique"`
+	Password  string         `json:"password"`
+	CreatedAt time.Time      `json:"createdAt" gorm:"autoCreateTime"`
+	UpdatedAt time.Time      `json:"updatedAt" gorm:"autoUpdateTime"`
+	DeletedAt gorm.DeletedAt `json:"deletedAt" gorm:"index"`
 }
